@@ -51,7 +51,6 @@ void initWindow(App *pApp) {
 
 void initVulkan(App* pApp) {
 	createInstance(pApp);
-
 }
 
 void mainLoop(App *pApp) {
@@ -61,6 +60,8 @@ void mainLoop(App *pApp) {
 }
 
 void cleanup(App* pApp) {
+	vkDestroyInstance(pApp->instance, NULL);
+
 	glfwDestroyWindow(pApp->window);
 	glfwTerminate();
 }
