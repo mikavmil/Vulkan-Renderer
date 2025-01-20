@@ -6,9 +6,18 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <vector>
 
-const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+
+typedef int8_t i8;
+typedef int16_t i16;
+typedef int32_t i32;
+
+const u32 WIDTH = 800;
+const u32 HEIGHT = 600;
 
 class Renderer {
 public:
@@ -45,6 +54,8 @@ private:
 	}
 
 	void cleanup() {
+		vkDestroyInstance(instance, nullptr);
+
 		glfwDestroyWindow(window);
 
 		glfwTerminate();
@@ -63,9 +74,8 @@ private:
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createInfo.pApplicationInfo = &appInfo;
 
-		uint32_t glfwExtensionCount = 0;
+		u32 glfwExtensionCount = 0;
 		const char** glfwExtensions;
-
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
 		createInfo.enabledExtensionCount = glfwExtensionCount;
@@ -73,11 +83,27 @@ private:
 
 		createInfo.enabledExtensionCount = 0;
 
+		//extension zooi (kan ik later naar kijken)
+
+		/*
+		u32 extentionCount = 0;
+		vkEnumerateInstanceExtensionProperties(nullptr, &extentionCount, nullptr);
+
+		std::vector<VkExtensionProperties> extensions(extentionCount);
+
+		std::cout << "available extensions:/n";
+
+		for (const auto& extension : extensions) {
+				std::cout << '/t' << extension.extensionName << '/n';
+		}
+		*/
+
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 		
 		if (result != VK_SUCCESS) {
 			throw std::runtime_error("Vulkan instance failed to create");
 		}
+
 	}
 
 
