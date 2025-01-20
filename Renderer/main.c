@@ -4,8 +4,17 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-const uint32_t WIN_WIDTH = 800;
-const uint32_t WIN_HEIGHT = 600;
+// maak later header files voor deze flippies
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+
+typedef int8_t i8;
+typedef int16_t i16;
+typedef int32_t i32;
+
+const u32 WIN_WIDTH = 800;
+const u32 WIN_HEIGHT = 600;
 const char* WIN_TITLE = "Vulkan Renderer";
 
 typedef struct App{
@@ -57,17 +66,34 @@ void cleanup(App* pApp) {
 }
 
 void createInstance(App* pApp) {
-	VkApplicationInfo appInfo = { 
+	VkApplicationInfo appInfo = {
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		.pApplicationName = WIN_TITLE,
 		.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
 		.pEngineName = "No Engine",
 		.engineVersion = VK_MAKE_VERSION(1, 0, 0),
-		.apiVersion = VK_API_VERSION_1_0
+		.apiVersion = VK_API_VERSION_1_0,
+		.pNext = NULL
 	};
-}
 
-VkInstanceCreateInfo createInfo = {
-	.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-	.pApplicationInfo = &appInfo
-};
+	u32 glfwExtensionCount = 0;
+	const char** glfwExtensions;
+
+	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+	VkInstanceCreateInfo createInfo = {
+		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+		.pApplicationInfo = &appInfo,
+		.enabledExtensionCount = glfwExtensionCount,
+		.ppEnabledExtensionNames = glfwExtensions,
+	};
+
+	createInfo.enabledExtensionCount = 0;
+
+	VkResult result = vkCreateInstance(&createInfo, NULL, &pApp->instance);
+
+	if (vkCreateInstance(&createInfo, NULL, &pApp->instance) != VK_SUCCESS) {
+		printf("Failed to create Vulkan instance\n");
+		exit(1);
+	}
+}
