@@ -84,8 +84,16 @@ private:
 		VkInstanceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createInfo.pApplicationInfo = &appInfo;
+		if (enableValidationLayers) {
+			createInfo.enabledLayerCount = static_cast<u32>(validationLayers.size());
+			createInfo.ppEnabledLayerNames = validationLayers.data();
+		}
+		else {
+			createInfo.enabledExtensionCount = 0;
+		}
 
 		u32 glfwExtensionCount = 0;
+
 		const char** glfwExtensions;
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -111,7 +119,7 @@ private:
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 		
-		if (result != VK_SUCCESS && !checkValidationLayerSupport) {
+		if (result != VK_SUCCESS && !checkValidationLayerSupport()) {
 			throw std::runtime_error("Vulkan instance failed to create");
 		}
 
