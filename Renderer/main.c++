@@ -19,6 +19,17 @@ typedef int32_t i32;
 const u32 WIDTH = 800;
 const u32 HEIGHT = 600;
 
+const std::vector<const char*> validationLayers = {
+	"VK_LAYER_KHRONOS_validation"
+};
+
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif 
+
+
 class Renderer {
 public:
 	void run() {
@@ -100,10 +111,35 @@ private:
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 		
-		if (result != VK_SUCCESS) {
+		if (result != VK_SUCCESS && !checkValidationLayerSupport) {
 			throw std::runtime_error("Vulkan instance failed to create");
 		}
 
+	}
+
+	bool checkValidationLayerSupport() {
+		u32 layerCount;
+
+		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+		std::vector<VkLayerProperties> availableLayers(layerCount);
+		vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+		for (const char* layerName : validationLayers) {
+			bool layerFound = false;
+
+			for (const auto& VkLayerProperties : availableLayers) {
+				if (strcmp(layerName, VkLayerProperties.layerName) == 0) {
+					layerFound = true;
+					break;
+				}
+			}
+
+			if (!layerFound) {
+				return false;
+			}
+
+		}
+		return true;
 	}
 
 
